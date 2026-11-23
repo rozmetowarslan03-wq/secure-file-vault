@@ -96,4 +96,20 @@ public class CryptoService {
         byte[] decryptedKeyBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedAesKeyBase64));
         return new SecretKeySpec(decryptedKeyBytes, "AES");
     }
+
+    public String signData(byte[] data, PrivateKey privateKey) throws Exception {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(data);
+        byte[] digitalSignature = signature.sign();
+        return Base64.getEncoder().encodeToString(digitalSignature);
+    }
+
+    public boolean verifySignature(byte[] data, String signatureBase64, PublicKey publicKey) throws Exception {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(publicKey);
+        signature.update(data);
+        byte[] signatureBytes = Base64.getDecoder().decode(signatureBase64);
+        return signature.verify(signatureBytes);
+    }
 }
